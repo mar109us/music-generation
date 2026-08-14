@@ -1,5 +1,5 @@
 // create web audio api context
-const audioCtx = new AudioContext();
+/* const audioCtx = new AudioContext(); */
 /*
 // create Oscillator node
 const oscillator = audioCtx.createOscillator();
@@ -9,7 +9,60 @@ oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hert
 oscillator.connect(audioCtx.destination);
 oscillator.start(); */
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+var audioContext = new AudioContext();
+var nextNotetime = audioContext.currentTime;
+
+function playSound(time, setFrequency) {
+   var osc = audioContext.createOscillator();
+   osc.type = "sine";
+   osc.connect(audioContext.destination);
+   osc.frequency.value = 220;
+   osc.start(time);
+   if (time === null) {
+      osc.stop(time + 0.05);
+   }
+}
+
+function scheduler(setFrequency) {
+   while (nextNotetime < audioContext.currentTime + 0.1) {
+      nextNotetime += 0.1;
+      playSound(nextNotetime, setFrequency);
+   }
+}
+
+/* startBtn.addEventListener(
+   "click",
+   function () {
+      scheduler();
+   },
+   false,
+); */
+
 addEventListener("keydown", (event) => {
+   if (event) {
+      scheduler(220);
+   } else {
+      playSound(null);
+   }
+
+   /* if (event.repeat) return; */
+});
+
+/* stopBtn.addEventListener(
+   "click",
+   function () {
+      clearTimeout(timerID);
+   },
+   false,
+); */
+
+if (audioContext.state === "suspended") {
+   audioContext.resume();
+}
+
+/* addEventListener("keydown", (event) => {
    if (event.key === "a") {
       if (event.repeat) return;
       const oscillator = audioCtx.createOscillator();
@@ -17,7 +70,9 @@ addEventListener("keydown", (event) => {
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // value in hertz
       oscillator.connect(audioCtx.destination);
-      oscillator.start();
+      oscillator.start(0);
+      oscillator.stop(1);
+      oscillator.start = 0;
    }
    if (event.key === "s") {
       if (event.repeat) return;
@@ -43,6 +98,5 @@ addEventListener("keydown", (event) => {
    if (event.key === "j") {
       osc.frequency.value = 392;
    } else {
-      oscillator.stop();
    }
-});
+}); */
