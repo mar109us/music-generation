@@ -4,6 +4,7 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Music</title>
+      <link rel="stylesheet" href="style.css" />
    </head>
    <body>
       <div class="controls">
@@ -31,7 +32,17 @@
          <button data-playing="init" id="play-button">Play</button>
       </div>
 
-      <canvas id="wave-graph"></canvas>
+      <canvas class="element-waveform" id="wave-graph"></canvas>
+
+      <div class="piano row width-half" id="element-pianoroll">
+         <div class="key key-width" id="key-A1">A</div>
+         <div class="key key-width" id="key-B1">B</div>
+         <div class="key key-width" id="key-B1">C</div>
+         <div class="key key-width" id="key-B1">D</div>
+         <div class="key key-width" id="key-B1">E</div>
+         <div class="key key-width" id="key-B1">F</div>
+         <div class="key key-width" id="key-B1">G</div>
+      </div>
    </body>
    <script src="main.js"></script>
 </html>

@@ -3,6 +3,11 @@ const frequencyControl = document.getElementById("freq-range");
 const playButton = document.getElementById("play-button");
 
 const audioCtx = new AudioContext();
+
+//check latency
+console.log("latency ",audioCtx.baseLatency)
+console.log("latency out ",audioCtx.outputLatency)
+
 const osc = new OscillatorNode(audioCtx, {
    type: typeSelect.value,
    frequency: frequencyControl.valueAsNumber,
@@ -89,3 +94,11 @@ function draw() {
 }
 
 draw();
+
+addEventListener("keydown", (event) => {
+  if (!event.repeat) {
+    console.log(`Key "${event.key}" pressed [event: keydown]`);
+  } else {
+    console.log(`Key "${event.key}" repeating [event: keydown]`);
+  }
+});
