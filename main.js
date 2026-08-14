@@ -1,111 +1,48 @@
-const typeSelect = document.getElementById("type-select");
-const frequencyControl = document.getElementById("freq-range");
-const playButton = document.getElementById("play-button");
-
+// create web audio api context
 const audioCtx = new AudioContext();
-
-//check latency
-console.log("latency ", audioCtx.baseLatency);
-console.log("latency out ", audioCtx.outputLatency);
-
-const osc = new OscillatorNode(audioCtx, {
-   type: typeSelect.value,
-   frequency: frequencyControl.valueAsNumber,
-});
-// Rather than creating a new oscillator for every start and stop
-// which you would do in an audio application, we are just going
-// to mute/un-mute for demo purposes - this means we need a gain node
-const gain = new GainNode(audioCtx);
-const analyser = new AnalyserNode(audioCtx, {
-   fftSize: 1024,
-   smoothingTimeConstant: 0.8,
-});
-osc.connect(gain).connect(analyser).connect(audioCtx.destination);
-
-typeSelect.addEventListener("change", () => {
-   osc.type = typeSelect.value;
-});
-
-frequencyControl.addEventListener("input", () => {
-   osc.frequency.value = frequencyControl.valueAsNumber;
-});
-
-playButton.addEventListener("click", () => {
-   if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-   }
-
-   if (playButton.dataset.playing === "init") {
-      osc.start(audioCtx.currentTime);
-      playButton.dataset.playing = "true";
-      playButton.innerText = "Pause";
-   } else if (playButton.dataset.playing === "false") {
-      gain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.2);
-      playButton.dataset.playing = "true";
-      playButton.innerText = "Pause";
-   } else if (playButton.dataset.playing === "true") {
-      gain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
-      playButton.dataset.playing = "false";
-      playButton.innerText = "Play";
-   }
-});
-
-const dpr = window.devicePixelRatio;
-const w = 500 * dpr;
-const h = 300 * dpr;
-const canvasEl = document.getElementById("wave-graph");
-canvasEl.width = w;
-canvasEl.height = h;
-const canvasCtx = canvasEl.getContext("2d");
-
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
-analyser.getByteTimeDomainData(dataArray);
-
-// draw an oscilloscope of the current oscillator
-function draw() {
-   analyser.getByteTimeDomainData(dataArray);
-
-   canvasCtx.fillStyle = "white";
-   canvasCtx.fillRect(0, 0, w, h);
-
-   canvasCtx.lineWidth = 4.0;
-   canvasCtx.strokeStyle = "black";
-   canvasCtx.beginPath();
-
-   const sliceWidth = (w * 1.0) / bufferLength;
-   let x = 0;
-
-   for (let i = 0; i < bufferLength; i++) {
-      const v = dataArray[i] / 128.0;
-      const y = (v * h) / 2;
-      if (i === 0) {
-         canvasCtx.moveTo(x, y);
-      } else {
-         canvasCtx.lineTo(x, y);
-      }
-      x += sliceWidth;
-   }
-
-   canvasCtx.lineTo(w, h / 2);
-   canvasCtx.stroke();
-
-   requestAnimationFrame(draw);
-}
-
-draw();
+/*
+// create Oscillator node
+const oscillator = audioCtx.createOscillator();
+ 
+oscillator.type = "square";
+oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
+oscillator.connect(audioCtx.destination);
+oscillator.start(); */
 
 addEventListener("keydown", (event) => {
-   /*  if (!event.repeat) {
-    console.log(`Key "${event.key}" pressed [event: keydown]`);
-  } else {
-    console.log(`Key "${event.key}" repeating [event: keydown]`);
-  } */
-   console.log(event);
-   console.log(event.key);
    if (event.key === "a") {
-      console.log(event);
-      console.log("Keyboard press:", event.key);
-      osc.frequency.value = 440;
+      if (event.repeat) return;
+      const oscillator = audioCtx.createOscillator();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // value in hertz
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+   }
+   if (event.key === "s") {
+      if (event.repeat) return;
+      const oscillator = audioCtx.createOscillator();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(246.93, audioCtx.currentTime); // value in hertz
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+   }
+   if (event.key === "d") {
+      osc.frequency.value = 261.63;
+   }
+   if (event.key === "f") {
+      osc.frequency.value = 293.66;
+   }
+   if (event.key === "g") {
+      osc.frequency.value = 329.63;
+   }
+   if (event.key === "h") {
+      osc.frequency.value = 349.23;
+   }
+   if (event.key === "j") {
+      osc.frequency.value = 392;
+   } else {
+      oscillator.stop();
    }
 });
