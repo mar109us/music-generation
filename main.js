@@ -13,16 +13,17 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 var audioContext = new AudioContext();
 var nextNotetime = audioContext.currentTime;
+var timerID;
 
 function playSound(time, setFrequency) {
+   let savedFrequency;
+   savedFrequency = setFrequency;
    var osc = audioContext.createOscillator();
-   osc.type = "sine";
    osc.connect(audioContext.destination);
    osc.frequency.value = 220;
    osc.start(time);
-   if (time === null) {
-      osc.stop(time + 0.05);
-   }
+   osc.stop(time + 0.1);
+   console.log("PLAYYYY");
 }
 
 function scheduler(setFrequency) {
@@ -30,24 +31,37 @@ function scheduler(setFrequency) {
       nextNotetime += 0.1;
       playSound(nextNotetime, setFrequency);
    }
+
+   timerID = window.setTimeout(scheduler, 10.0);
 }
 
-/* startBtn.addEventListener(
-   "click",
-   function () {
-      scheduler();
-   },
-   false,
-); */
+if (audioContext.state === "suspended") {
+   audioContext.resume();
+}
+
+/* const keysPressed = {};
+
+window.addEventListener('keydown', (e) => {
+    keysPressed[e.key] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+    keysPressed[e.key] = false;
+}); */
 
 addEventListener("keydown", (event) => {
    if (event) {
+      if (event.repeat) return;
       scheduler(220);
-   } else {
-      playSound(null);
+      console.log("keydown", event.key);
    }
+});
 
-   /* if (event.repeat) return; */
+addEventListener("keyup", (event) => {
+   if (event) {
+       clearTimeout(timerID);
+      console.log("keyup", event.key);
+   }
 });
 
 /* stopBtn.addEventListener(
@@ -58,9 +72,9 @@ addEventListener("keydown", (event) => {
    false,
 ); */
 
-if (audioContext.state === "suspended") {
+/* if (audioContext.state === "suspended") {
    audioContext.resume();
-}
+} */
 
 /* addEventListener("keydown", (event) => {
    if (event.key === "a") {
