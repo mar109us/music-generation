@@ -42,13 +42,12 @@ function makeSound(action, pressedFrequency, pressedKey) {
    gainNode = audioContext.createGain();
 
    gainNode.connect(audioContext.destination);
-
    createOsc(pressedFrequency);
 
    if (activeKey.assignedOscillator[pressedKey] === null) {
-      activeKey.assignedOscillator[pressedKey] = oscillators.length - 1
+      activeKey.assignedOscillator[pressedKey] = oscillators.length - 1;
    }
-   console.log(activeKey.assignedOscillator[pressedKey])
+   console.log(activeKey.assignedOscillator[pressedKey]);
 
    const currentTime = audioContext.currentTime;
    /* oscillators.forEach(function (oscillator) {
@@ -57,11 +56,16 @@ function makeSound(action, pressedFrequency, pressedKey) {
    }); */
 
    if (action === "play") {
-      console.log(oscillators.pressedKey)
+      oscillators[activeKey.assignedOscillator[pressedKey]].start(currentTime);
+      console.log(oscillators.pressedKey);
       /* oscillators[pressedKey].start(currentTime) */
    }
    if (action === "stop") {
+      oscillators[activeKey.assignedOscillator[pressedKey]].stop(
+         currentTime + 0.22,
+      );
       
+      activeKey.assignedOscillator[pressedKey] = null;
    }
 }
 
@@ -72,12 +76,10 @@ function createOsc(selectedFrequency) {
    oscillator.connect(gainNode);
    oscillators.push(oscillator);
 
-   gainNode.gain.value = 1 / oscillators.length;
+   gainNode.gain.value = 1 /* / oscillators.length */;
 
    console.log(oscillators);
 }
-
-function startOscillator() {}
 
 addEventListener("keydown", (event) => {
    if (event.repeat) return;
@@ -92,7 +94,7 @@ addEventListener("keydown", (event) => {
    ) {
       activeKey.active[event.key] = true;
       console.log(activeKey.active);
-      makeSound("play", activeKey.frequency[event.key], event.key)
+      makeSound("play", activeKey.frequency[event.key], event.key);
    }
 });
 
@@ -108,6 +110,7 @@ addEventListener("keyup", (event) => {
    ) {
       activeKey.active[event.key] = false;
       console.log(activeKey.active);
+      makeSound("stop", activeKey.frequency[event.key], event.key);
    }
 
    /* makeSound(event.key, audioContext.currentTime); */
