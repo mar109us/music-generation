@@ -23,32 +23,52 @@ const activeKey = {
       h: 349.23,
       j: 392,
    },
+   assignedOscillator: {
+      a: null,
+      s: null,
+      d: null,
+      f: null,
+      g: null,
+      h: null,
+      j: null,
+   },
 };
 
 /* window.addEventListener(touchEvent, makeSound); */
 
-function makeSound(pressedKey, releasedKey) {
+function makeSound(action, pressedFrequency, pressedKey) {
    audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
    gainNode = audioContext.createGain();
 
    gainNode.connect(audioContext.destination);
 
-   createOsc(pressedKey);
+   createOsc(pressedFrequency);
+
+   if (activeKey.assignedOscillator[pressedKey] === null) {
+      activeKey.assignedOscillator[pressedKey] = oscillators.length
+   }
+   console.log(activeKey.assignedOscillator[pressedKey])
 
    const currentTime = audioContext.currentTime;
-   oscillators.forEach(function (oscillator) {
-      // The next line is probably not needed.
-      // currentTime = audioContext.currentTime;
+   /* oscillators.forEach(function (oscillator) {
       oscillator.start(currentTime);
       oscillator.stop(currentTime + 0.22);
-   });
+   }); */
+
+   if (action === "play") {
+      console.log(oscillators.pressedKey)
+      /* oscillators[pressedKey].start(currentTime) */
+   }
+   if (action === "stop") {
+      
+   }
 }
 
-function createOsc(freq) {
+function createOsc(selectedFrequency) {
    const oscillator = audioContext.createOscillator();
 
-   oscillator.frequency.value = freq;
+   oscillator.frequency.value = selectedFrequency;
    oscillator.connect(gainNode);
    oscillators.push(oscillator);
 
@@ -61,56 +81,33 @@ function startOscillator() {}
 
 addEventListener("keydown", (event) => {
    if (event.repeat) return;
-   if (event.key === "a" || "s" || "d" || "f" || "g" || "h" || "j") {
-      if (event.key === "a") {
-         console.log(activeKey.active[event.key]);
-         activeKey.active[event.key] = true;
-         console.log(activeKey);
-      }
-      if (event.key === "s") {
-         activeKey.s.active = true;
-      }
-      if (event.key === "d") {
-         activeKey.d.active = true;
-      }
-      if (event.key === "f") {
-         activeKey.f.active = true;
-      }
-      if (event.key === "g") {
-         activeKey.g.active = true;
-      }
-      if (event.key === "h") {
-         activeKey.h.active = true;
-      }
-      if (event.key === "j") {
-         activeKey.j.active = true;
-      }
+   if (
+      event.key === "a" ||
+      event.key === "s" ||
+      event.key === "d" ||
+      event.key === "f" ||
+      event.key === "g" ||
+      event.key === "h" ||
+      event.key === "j"
+   ) {
+      activeKey.active[event.key] = true;
+      console.log(activeKey.active);
+      makeSound("play", activeKey.frequency[event.key], event.key)
    }
 });
 
 addEventListener("keyup", (event) => {
-   if (event.key === "a" || "s" || "d" || "f" || "g" || "h" || "j") {
-      if (event.key === "a") {
-         activeKey.a.active = 0;
-      }
-      if (event.key === "s") {
-         activeKey.s.active = false;
-      }
-      if (event.key === "d") {
-         activeKey.d.active = false;
-      }
-      if (event.key === "f") {
-         activeKey.f.active = false;
-      }
-      if (event.key === "g") {
-         activeKey.g.active = false;
-      }
-      if (event.key === "h") {
-         activeKey.h.active = false;
-      }
-      if (event.key === "j") {
-         activeKey.j.active = false;
-      }
+   if (
+      event.key === "a" ||
+      event.key === "s" ||
+      event.key === "d" ||
+      event.key === "f" ||
+      event.key === "g" ||
+      event.key === "h" ||
+      event.key === "j"
+   ) {
+      activeKey.active[event.key] = false;
+      console.log(activeKey.active);
    }
 
    /* makeSound(event.key, audioContext.currentTime); */
