@@ -34,14 +34,15 @@ const activeKey = {
    },
 };
 
+let heldDownKeys = 0.9;
 /* window.addEventListener(touchEvent, makeSound); */
 
+audioContext = new (window.AudioContext || window.webkitAudioContext)();
 function makeSound(action, pressedFrequency, pressedKey) {
-   audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
    gainNode = audioContext.createGain();
 
    gainNode.connect(audioContext.destination);
+
    createOsc(pressedFrequency);
 
    if (activeKey.assignedOscillator[pressedKey] === null) {
@@ -50,21 +51,20 @@ function makeSound(action, pressedFrequency, pressedKey) {
    console.log(activeKey.assignedOscillator[pressedKey]);
 
    const currentTime = audioContext.currentTime;
-   /* oscillators.forEach(function (oscillator) {
-      oscillator.start(currentTime);
-      oscillator.stop(currentTime + 0.22);
-   }); */
 
    if (action === "play") {
       oscillators[activeKey.assignedOscillator[pressedKey]].start(currentTime);
-      console.log(oscillators.pressedKey);
-      /* oscillators[pressedKey].start(currentTime) */
    }
    if (action === "stop") {
+         const attackTime = 0.2;
+   const startTime = audioContext.currentTime;
+
+   gainNode.gain.setValueAtTime(0, startTime);
+   gainNode.gain.setTargetAtTime(1 / heldDownKeys, startTime, attackTime);
       oscillators[activeKey.assignedOscillator[pressedKey]].stop(
-         currentTime + 0.22,
+         currentTime /* + 0.22 */,
       );
-      
+
       activeKey.assignedOscillator[pressedKey] = null;
    }
 }
@@ -76,9 +76,11 @@ function createOsc(selectedFrequency) {
    oscillator.connect(gainNode);
    oscillators.push(oscillator);
 
-   gainNode.gain.value = 1 /* / oscillators.length */;
+   const attackTime = 0.002;
+   const startTime = audioContext.currentTime;
 
-   console.log(oscillators);
+   gainNode.gain.setValueAtTime(0, startTime);
+   gainNode.gain.setTargetAtTime(1 / heldDownKeys, startTime, attackTime);
 }
 
 addEventListener("keydown", (event) => {
@@ -92,6 +94,7 @@ addEventListener("keydown", (event) => {
       event.key === "h" ||
       event.key === "j"
    ) {
+      heldDownKeys = heldDownKeys * 2;
       activeKey.active[event.key] = true;
       console.log(activeKey.active);
       makeSound("play", activeKey.frequency[event.key], event.key);
@@ -108,118 +111,9 @@ addEventListener("keyup", (event) => {
       event.key === "h" ||
       event.key === "j"
    ) {
+      heldDownKeys = heldDownKeys / 2;
       activeKey.active[event.key] = false;
       console.log(activeKey.active);
       makeSound("stop", activeKey.frequency[event.key], event.key);
    }
-
-   /* makeSound(event.key, audioContext.currentTime); */
 });
-
-/* window.AudioContext = window.AudioContext || window.webkitAudioContext;
-
-let audioContext = new AudioContext();
-let nextNotetime = audioContext.currentTime;
-let timerID;
-
-if (audioContext.state === "suspended") {
-   audioContext.resume();
-}
-let keyA = false;
-let keyS = false;
-
-function playSound(time, keyPressed) {
-   if (keyPressed === "a") {
-      keyA = true;
-   }
-   if (keyA) {
-      let osc = audioContext.createOscillator();
-      osc.connect(audioContext.destination);
-      osc.frequency.value = 220;
-      osc.start(time);
-      osc.stop(time + 0.1);
-      console.log("AAAAAA");
-   }
-   if (keyPressed === "s") {
-      keyS = true;
-   }
-   if (keyS) {
-      let osc = audioContext.createOscillator();
-      osc.connect(audioContext.destination);
-      osc.frequency.value = 246.93;
-      osc.start(time);
-      osc.stop(time + 0.1);
-      console.log("SSSSSS");
-   }
-}
-
-function scheduler(keyPressed) {
-   while (nextNotetime < audioContext.currentTime) {
-      nextNotetime += 0.1;
-      playSound(nextNotetime, keyPressed);
-   }
-   timerID = window.setTimeout(scheduler, 1.0);
-}
-
-addEventListener("keydown", (event) => {
-   if (event.key === "a") {
-      if (event.repeat) return;
-      scheduler(event.key);
-      console.log("keydown", event.key);
-   }
-   if (event.key === "s") {
-      if (event.repeat) return;
-      scheduler(event.key);
-      console.log("keydown", event.key);
-   }
-});
-
-addEventListener("keyup", (event) => {
-   if (event.key === "a") {
-      clearTimeout(timerID);
-      console.log("keyup", event.key);
-   }
-   if (event.key === "s") {
-      clearTimeout(timerID);
-      console.log("keyup", event.key);
-   }
-}); */
-
-/* addEventListener("keydown", (event) => {
-   if (event.key === "a") {
-      if (event.repeat) return;
-      const oscillator = audioCtx.createOscillator();
-
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // value in hertz
-      oscillator.connect(audioCtx.destination);
-      oscillator.start(0);
-      oscillator.stop(1);
-      oscillator.start = 0;
-   }
-   if (event.key === "s") {
-      if (event.repeat) return;
-      const oscillator = audioCtx.createOscillator();
-
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(246.93, audioCtx.currentTime); // value in hertz
-      oscillator.connect(audioCtx.destination);
-      oscillator.start();
-   }
-   if (event.key === "d") {
-      osc.frequency.value = 261.63;
-   }
-   if (event.key === "f") {
-      osc.frequency.value = 293.66;
-   }
-   if (event.key === "g") {
-      osc.frequency.value = 329.63;
-   }
-   if (event.key === "h") {
-      osc.frequency.value = 349.23;
-   }
-   if (event.key === "j") {
-      osc.frequency.value = 392;
-   } else {
-   }
-}); */
