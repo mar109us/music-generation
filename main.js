@@ -1,6 +1,6 @@
 let audioContext;
-let gainNode;
-let touchEvent = "ontouchstart" in window ? "touchstart" : "click";
+let gainNode;/* 
+let touchEvent = "ontouchstart" in window ? "touchstart" : "click"; */
 
 let oscillators = [];
 
