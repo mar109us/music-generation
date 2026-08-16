@@ -46,7 +46,7 @@ function makeSound(action, pressedFrequency, pressedKey) {
    createOsc(pressedFrequency);
 
    if (activeKey.assignedOscillator[pressedKey] === null) {
-      activeKey.assignedOscillator[pressedKey] = oscillators.length
+      activeKey.assignedOscillator[pressedKey] = oscillators.length - 1
    }
    console.log(activeKey.assignedOscillator[pressedKey])
 
